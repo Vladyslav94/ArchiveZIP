@@ -16,7 +16,7 @@ public class ZipFileManager {
 
     public void createZip(Path source) throws Exception {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zipFile));
-             InputStream inputStream = Files.newInputStream(source)) {
+             InputStream inputStream = Files.newInputStream(source);) {
             ZipEntry zipEntry = new ZipEntry(source.getFileName().toString());
             zipOutputStream.putNextEntry(zipEntry);
             int len;
