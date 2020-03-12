@@ -1,5 +1,7 @@
 package com.javarush.task.task31.task3110;
 
+import com.javarush.task.task31.task3110.command.ExitCommand;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,5 +42,11 @@ public class Archiver {
             e.printStackTrace();
         }
 
+        ExitCommand exitCommand = new ExitCommand();
+        try {
+            exitCommand.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
