@@ -1,6 +1,5 @@
 package com.javarush.task.task31.task3110;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -12,9 +11,9 @@ public class FileManager {
     private Path rootPath;
     private List<Path> fileList;
 
-    public FileManager(Path path) throws IOException {
-        rootPath = path;
-        fileList = new ArrayList<>();
+    public FileManager(Path rootPath) throws IOException {
+        this.rootPath = rootPath;
+        this.fileList = new ArrayList<>();
         collectFileList(rootPath);
     }
 
@@ -23,16 +22,21 @@ public class FileManager {
     }
 
     private void collectFileList(Path path) throws IOException {
+        // Добавляем только файлы
         if (Files.isRegularFile(path)) {
-            Path p = rootPath.relativize(path);
-            fileList.add(p);
-        } else if (Files.isDirectory(path)) {
-            try (DirectoryStream<Path> d = Files.newDirectoryStream(path)) {
-                for (Path entry : d) {
-                    collectFileList(entry);
+            Path relativePath = rootPath.relativize(path);
+            fileList.add(relativePath);
+        }
+
+        // Добавляем содержимое директории
+        if (Files.isDirectory(path)) {
+            // Рекурсивно проходимся по всему содержмому директории
+            // Чтобы не писать код по вызову close для DirectoryStream, обернем вызов newDirectoryStream в try-with-resources
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path)) {
+                for (Path file : directoryStream) {
+                    collectFileList(file);
                 }
             }
-
         }
     }
 }
