@@ -1,52 +1,37 @@
 package com.javarush.task.task31.task3110;
 
-import com.javarush.task.task31.task3110.command.ExitCommand;
+import com.javarush.task.task31.task3110.exception.WrongZipFileException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Archiver {
-    public static void main(String[] args) {
-        System.out.println("Please, put path to archive");
+    public static void main(String[] args) throws IOException {
 
-        String pathName = null;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            pathName = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Operation operation = null;
+        do {
+            try {
+                operation = askOperation();
+                CommandExecutor.execute(operation);
+            } catch (WrongZipFileException e) {
+                ConsoleHelper.writeMessage("Вы не выбрали файл архива или выбрали неверный файл.");
+            } catch (Exception e) {
+                ConsoleHelper.writeMessage("Произошла ошибка. Проверьте введенные данные.");
+            }
 
-        assert pathName != null;
-        Path pathsToArchive = Paths.get(pathName);
-        ZipFileManager zipFileManager = new ZipFileManager(pathsToArchive);
+        } while (operation != Operation.EXIT);
+    }
 
-        System.out.println("Please, put file name to archive");
 
-        String fileName = null;
-        try {
-            fileName = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static Operation askOperation() throws IOException {
+        ConsoleHelper.writeMessage("");
+        ConsoleHelper.writeMessage("Выберите операцию:");
+        ConsoleHelper.writeMessage(String.format("\t %d - упаковать файлы в архив", Operation.CREATE.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - добавить файл в архив", Operation.ADD.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - удалить файл из архива", Operation.REMOVE.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - распаковать архив", Operation.EXTRACT.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - просмотреть содержимое архива", Operation.CONTENT.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - выход", Operation.EXIT.ordinal()));
 
-        assert fileName != null;
-        Path pathsToFile = Paths.get(fileName);
-
-        try {
-            zipFileManager.createZip(pathsToFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        ExitCommand exitCommand = new ExitCommand();
-        try {
-            exitCommand.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return Operation.values()[ConsoleHelper.readInt()];
     }
 }
